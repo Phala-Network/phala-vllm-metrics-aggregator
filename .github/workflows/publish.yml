@@ -7,7 +7,7 @@ permissions:
   packages: write
 jobs:
   publish:
-    if: startsWith(github.event.release.tag_name, 'metrics-aggregator-v') && !github.event.release.draft
+    if: startsWith(github.event.release.tag_name, 'v') && !github.event.release.draft
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,14 +18,14 @@ jobs:
           python-version: '3.13'
       - name: Test exact source
         run: |
-          python -m pip install --require-hashes --only-binary=:all: -r image-builds/metrics-aggregator/requirements.txt
-          python -m unittest discover -s image-builds/metrics-aggregator
+          python -m pip install --require-hashes --only-binary=:all: -r requirements.txt
+          python -m unittest discover -s .
       - name: Identify source and release
         id: identity
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          version="${RELEASE_TAG#metrics-aggregator-v}"
+          version="${RELEASE_TAG#v}"
           [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
@@ -38,12 +38,12 @@ jobs:
       - uses: docker/build-push-action@v6
         id: build
         with:
-          context: image-builds/metrics-aggregator
+          context: .
           platforms: linux/amd64
           push: true
           tags: ghcr.io/phala-network/metrics-aggregator:${{ steps.identity.outputs.version }}
           labels: |
-            org.opencontainers.image.source=https://github.com/Phala-Network/phala-models-compose
+            org.opencontainers.image.source=https://github.com/Phala-Network/phala-vllm-metrics-aggregator
             org.opencontainers.image.revision=${{ steps.identity.outputs.revision }}
             org.opencontainers.image.version=${{ steps.identity.outputs.version }}
       - name: Published identity
