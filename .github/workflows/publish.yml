@@ -41,7 +41,7 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/phala-network/metrics-aggregator:${{ steps.identity.outputs.version }}
+          tags: ghcr.io/phala-network/vllm-metrics-aggregator:${{ steps.identity.outputs.version }}
           labels: |
             org.opencontainers.image.source=https://github.com/Phala-Network/phala-vllm-metrics-aggregator
             org.opencontainers.image.revision=${{ steps.identity.outputs.revision }}
